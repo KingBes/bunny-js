@@ -62,26 +62,24 @@
      * @param {string} b 要匹配的路由
      * @returns 
      */
-    function matchAndExtract(a, b) {
+    function matchParams(a, b) {
         if (a === b) {
             return true;
         }
-        const placeholders = b.match(/{([^}]+)}/g);
-        if (!placeholders) {
-            return false;
+        const aArr = a.split("/")
+        const bArr = b.split("/")
+        if (aArr.length !== bArr.length) {
+            return false
         }
-        const regex = b.replace(/{([^}]+)}/g, '(\\w+)');
-        const match = a.match(new RegExp(regex));
-        if (match) {
-            const extractedData = {};
-            for (let i = 0; i < placeholders.length; i++) {
-                const placeholderName = placeholders[i].slice(1, -1);
-                extractedData[placeholderName] = match[i + 1];
+        console.log(aArr, bArr)
+        for (let i = 0; i < aArr.length; i++) {
+            if (aArr[i] === bArr[i] || ) {
+
+            } else {
+                return false
             }
-            return extractedData;
-        } else {
-            return false;
         }
+
     }
 
     /**
@@ -196,6 +194,8 @@
             for (const value of routeJson) {
                 const div = document.createElement("div")
                 div.setAttribute("route-name", value.name)
+                div.setAttribute("params", "{}")
+                div.setAttribute("query", "{}")
                 div.setAttribute("style", "display:none;")
                 this.shadow.append(div)
                 this.cache.template[value.name] = {
@@ -214,8 +214,15 @@
             this.shadow.querySelector("div[route-name]")
                 .style.display = "none"
             let thisUrl = url()
-
-            console.log(thisUrl)
+            let isParams = null
+            for (const [name, value] of Object.entries(this.cache.template)) {
+                console.log(name, value)
+                for (const p of value.path) {
+                    matchParams(thisUrl.hash.href, p)
+                }
+            }
+            console.log(isParams)
+            console.log(thisUrl.hash.href)
             /* this.shadow.querySelector("div[route-name]")
                 .style.display = "none"
             this.shadow.querySelector(`div[route-name="${name}"]`)
