@@ -1,0 +1,26 @@
+[
+    {
+        "name": "index",
+        "path": [
+            "/",
+            "/index",
+            "/index.html"
+        ],
+        "page": "/src/home.html"
+    },
+    {
+        "name": "about",
+        "path": [
+            "/about",
+            "/about.html"
+        ],
+        "page": "/src/about.html"
+    },
+    {
+        "name": "other",
+        "path": [
+            "/other/{id}"
+        ],
+        "page": "/src/other.html"
+    }
+]

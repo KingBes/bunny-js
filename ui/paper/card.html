@@ -1,0 +1,103 @@
+<template>
+    <style>
+        .card {
+            transition: all 235ms ease 0s;
+            box-shadow: 15px 28px 25px -18px rgba(0, 0, 0, 0.2);
+            border-color: #41403e;
+            border-color: var(--muted-light);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-style: solid;
+            border-width: 2px;
+            flex-direction: column;
+            position: relative;
+            will-change: transform;
+            word-wrap: break-word;
+            border-bottom-left-radius: 15px 255px;
+            border-bottom-right-radius: 225px 15px;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 15px 225px;
+            overflow: hidden;
+        }
+
+        .card .header {
+            border-bottom-style: solid;
+            border-bottom-width: 2px;
+            border-bottom-left-radius: 0px 125px;
+            border-bottom-right-radius: 225px 15px;
+        }
+
+        .card .footer {
+            border-top-style: solid;
+            border-top-width: 2px;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 0px 125px;
+        }
+
+        .card .body {
+            flex: 1 1 auto;
+            padding: 1.25rem;
+        }
+
+        .card .header,
+        .card .footer {
+            background-color: #41403e;
+            background-color: var(--white-dark);
+            border-color: #41403e;
+            border-color: var(--muted-light);
+            padding: 0.75rem 1.25rem;
+        }
+
+        .card:hover {
+            transform: translate3d(0, 2px, 0);
+            box-shadow: 2px 8px 8px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card .image-top,
+        .card .image-bottom,
+        .card img {
+            border: 0;
+            border-radius: 0;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+    <div class="card">
+        <div class="header">
+            <slot name="header"></slot>
+        </div>
+        <div class="image-top"></div>
+        <div class="body">
+            <slot name="body"></slot>
+        </div>
+        <div class="image-bottom"></div>
+        <div class="footer">
+            <slot name="footer"></slot>
+        </div>
+    </div>
+    <script>
+        for (const attr of attrs) {
+            if (attr.name == "image-top" || attr.name == "image-bottom") {
+                const img = document.createElement("img")
+                img.src = attr.value
+                currdoc.querySelector(`[class="${attr.name}"]`)
+                    .appendChild(img)
+            } else {
+                currdoc
+                    .querySelector(".card")
+                    .setAttribute(attr.name, attr.value)
+            }
+        }
+        let header = currdoc.querySelector('[class="header"]')
+        let footer = currdoc.querySelector('[class="footer"]')
+
+        if (!header.querySelector('slot').assignedNodes().length) {
+            header.style.display = "none"
+        }
+
+        if (!footer.querySelector('slot').assignedNodes().length) {
+            footer.style.display = "none"
+        }
+
+    </script>
+</template>

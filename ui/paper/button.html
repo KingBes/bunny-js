@@ -1,0 +1,149 @@
+<template>
+    <style>
+        button {
+            display: inline-block;
+            margin: 0 auto;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom-left-radius: 15px 255px;
+            border-bottom-right-radius: 225px 15px;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 15px 225px;
+            transition: all 235ms ease 0s;
+            box-shadow: 15px 28px 25px -18px rgba(0, 0, 0, 0.2);
+            transition: all 235ms ease-in-out 0s;
+            color: #41403e;
+            color: var(--primary);
+            border-color: #41403e;
+            border-color: var(--primary);
+            background-color: #41403e;
+            background-color: var(--main-background);
+            align-self: center;
+            background-image: none;
+            border-style: solid;
+            border-width: 2px;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 1rem;
+            outline: none;
+            padding: 0.75rem;
+            line-height: 1.15;
+        }
+
+        button:active {
+            border-color: rgba(0, 0, 0, 0.2);
+            transition: none;
+        }
+
+        button:hover {
+            transform: translate3d(0, 2px, 0);
+            box-shadow: 2px 8px 8px -5px rgba(0, 0, 0, 0.3);
+            background-color: #cdcccb
+        }
+
+        [size="large"] {
+            transition: all 235ms ease 0s;
+            box-shadow: 20px 38px 34px -26px rgba(0, 0, 0, 0.2);
+            font-size: 2rem;
+            padding: 1rem;
+        }
+
+        [size="small"] {
+            transition: all 235ms ease 0s;
+            box-shadow: 10px 19px 17px -13px rgba(0, 0, 0, 0.2);
+            font-size: 0.75rem;
+            padding: 0.5rem;
+        }
+
+        [disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .secondary {
+            background-color: #41403e;
+            background-color: var(--main-background);
+            color: #41403e;
+            color: var(--secondary);
+            border-color: #41403e;
+            border-color: var(--secondary);
+        }
+
+        .secondary:hover {
+            background-color: #d8ebfd;
+        }
+
+        .secondary:hover:active {
+            background-color: #a7d3fa;
+            border-color: var(--secondary);
+        }
+
+        .success {
+            background-color: #41403e;
+            background-color: var(--main-background);
+            color: #41403e;
+            color: var(--success);
+            border-color: #41403e;
+            border-color: var(--success);
+        }
+
+        .success:hover {
+            background-color: #d5dfc8;
+        }
+
+        .success:hover:active {
+            border-color: var(--success);
+            background-color: #bccca8;
+        }
+
+        .warning {
+            background-color: #41403e;
+            background-color: var(--main-background);
+            color: #41403e;
+            color: var(--warning);
+            border-color: #41403e;
+            border-color: var(--warning);
+        }
+
+        .warning:hover {
+            background-color: #f5f0c6;
+        }
+
+        .warning:hover:active {
+            border-color: var(--warning);
+            background-color: #ede49b;
+        }
+
+        .danger {
+            background-color: #41403e;
+            background-color: var(--main-background);
+            color: #41403e;
+            color: var(--danger);
+            border-color: #41403e;
+            border-color: var(--danger);
+        }
+
+        .danger:hover {
+            background-color: #f0cbc9;
+        }
+
+        .danger:hover:active {
+            border-color: var(--danger);
+            background-color: #e6a5a1;
+        }
+
+        [round] {
+            border-radius: 1em;
+        }
+    </style>
+    <button type="button">
+        <slot name="text">默认</slot>
+    </button>
+    <script>
+        for (const attr of attrs) {
+            currdoc
+                .querySelector("button")
+                .setAttribute(attr.name, attr.value)
+        }
+    </script>
+</template>

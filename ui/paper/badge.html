@@ -1,0 +1,59 @@
+<template>
+    <style>
+        span {
+            border-bottom-left-radius: 15px 255px;
+            border-bottom-right-radius: 225px 15px;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 15px 225px;
+            color: #41403e;
+            color: var(--white);
+            background-color: #41403e;
+            background-color: var(--muted);
+            border-color: #41403e;
+            border-color: var(--primary);
+            border: 2px solid;
+            border-color: transparent;
+            display: inline-block;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0.25em 0.4em;
+            text-align: center;
+            vertical-align: baseline;
+            white-space: nowrap;
+        }
+
+        [color="secondary"] {
+            background-color: #41403e;
+            background-color: var(--secondary);
+        }
+
+        [color="success"] {
+            background-color: #41403e;
+            background-color: var(--success);
+        }
+
+        [color="warning"] {
+            background-color: #41403e;
+            background-color: var(--warning);
+        }
+
+        [color="danger"] {
+            background-color: #41403e;
+            background-color: var(--danger);
+        }
+    </style>
+    <span></span>
+    <script>
+        for (const attr of attrs) {
+            currdoc
+                .querySelector("span")
+                .setAttribute(attr.name, attr.value)
+        }
+        let text = ""
+        if (attrs?.text.value) {
+            text = attrs.text.value
+        }
+        currdoc.querySelector("span").innerHTML = text
+    </script>
+</template>

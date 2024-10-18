@@ -1,0 +1,44 @@
+<template>
+    <style>
+        input {
+            color: #41403e;
+            color: var(--primary);
+            border-color: #41403e;
+            border-color: var(--primary);
+            background: transparent;
+            border-bottom-left-radius: 15px 255px;
+            border-bottom-right-radius: 225px 15px;
+            border-style: solid;
+            border-top-left-radius: 255px 15px;
+            border-top-right-radius: 15px 225px;
+            border-width: 2px;
+            display: block;
+            font-size: 1rem;
+            outline: none;
+            padding: 0.5rem;
+            margin: 0;
+            overflow: visible;
+        }
+
+        input:focus {
+            border-color: #41403e;
+            border-color: var(--secondary);
+            border-style: solid;
+            border-width: 2px;
+            box-shadow: 0 0 3px #0b74d5;
+        }
+
+        input[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+    <input />
+    <script>
+        for (const attr of attrs) {
+            currdoc
+                .querySelector("input")
+                .setAttribute(attr.name, attr.value)
+        }
+    </script>
+</template>
