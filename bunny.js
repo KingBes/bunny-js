@@ -60,26 +60,37 @@
      * 匹配路由
      * @param {string} a 路由
      * @param {string} b 要匹配的路由
-     * @returns 
+     * @returns object|false
      */
     function matchParams(a, b) {
+
+        const data = {}
+
         if (a === b) {
-            return true;
+            return data;
         }
+
         const aArr = a.split("/")
         const bArr = b.split("/")
+
         if (aArr.length !== bArr.length) {
             return false
         }
-        console.log(aArr, bArr)
+        let status = false
         for (let i = 0; i < aArr.length; i++) {
-            if (aArr[i] === bArr[i] || ) {
-
+            let match = bArr[i].match(/^\{([^}\s]*)\}$/)
+            if (aArr[i] !== bArr[i] && match) {
+                data[match[1]] = aArr[i]
+                status = true
             } else {
-                return false
+                continue
             }
         }
-
+        if (!status) {
+            return status
+        } else {
+            return status
+        }
     }
 
     /**
@@ -213,47 +224,43 @@
         navigate() {
             this.shadow.querySelector("div[route-name]")
                 .style.display = "none"
+
             let thisUrl = url()
-            let isParams = null
-            for (const [name, value] of Object.entries(this.cache.template)) {
-                console.log(name, value)
-                for (const p of value.path) {
-                    matchParams(thisUrl.hash.href, p)
+            // 当记录存在，直接返回
+            if (typeof this.cache.route[thisUrl.hash.href] !== "undefined") {
+                this.shadow.querySelector(`div[route-name="${thenName}"]`)
+                    .style.display = "block"
+            } else {
+                let isRoute = false
+                let params = {}
+                let thenName
+                for (const [name, value] of Object.entries(this.cache.template)) {
+                    console.log(name, value)
+                    for (const p of value.path) {
+                        params = matchParams(thisUrl.hash.href, p)
+                        if (params !== false) {
+                            isRoute = true
+                            thenName = name
+                            // 记录路由
+                            this.cache.route[thisUrl.hash.href] = name
+                            break //匹配一个就够了
+                        } else {
+                            continue
+                        }
+                    }
                 }
-            }
-            console.log(isParams)
-            console.log(thisUrl.hash.href)
-            /* this.shadow.querySelector("div[route-name]")
-                .style.display = "none"
-            this.shadow.querySelector(`div[route-name="${name}"]`)
-                .style.display = "block" */
-        }
-
-        /**
-         * 更新模板内容
-         * @param {template} tpl 模板内容
-         */
-        /* async updateShadow(tpl) {
-            for (const value of tpl.childNodes.values()) {
-                if (value.nodeName !== "SCRIPT") {
-                    this.shadow.appendChild(value.cloneNode(true));
+                // 确定有效路由
+                if (isRoute) {
+                    // --------------------------------应该还要加 params 和 query
+                    this.shadow.querySelector(`div[route-name="${thenName}"]`)
+                        .style.display = "block"
                 } else {
-                    const fn = new Function('doc,component',
-                        `(function(document,component) {
-                        "use strict";
-                        ${value.textContent}
-                    })(doc,component)`)
-                    fn(this.shadow, this.component)
+                    throw new Error('No route was matched. Procedure');
                 }
             }
-        } */
 
-        // 清空所有内容
-        /* async clearShadow() {
-            while (this.shadow.firstChild) {
-                this.shadow.removeChild(this.shadow.firstChild);
-            }
-        } */
+            console.log(thisUrl.hash.href)
+        }
 
         // 实例化组件
         /* component(tagName) {
