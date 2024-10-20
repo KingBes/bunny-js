@@ -104,7 +104,7 @@
     }
 
     function url() {
-        const fullHash = win.location.hash.substring(1);
+        const fullHash = win.location.hash.substring(1)
         let targetHash;
         if (fullHash.indexOf('#') > -1) {
             targetHash = fullHash.substring(1, fullHash.indexOf('#', 1)) || "/";
@@ -112,6 +112,7 @@
             targetHash = fullHash.substring(1) || "/";
         }
         let data = {
+            query: Object.fromEntries((new URLSearchParams(window.location.search)).entries()),
             href: win.location.href.replace(win.location.origin, ""),
             hash: {
                 href: targetHash
@@ -214,7 +215,6 @@
                     dom: new RouteComponent(div, await getCompontent(value.page))
                 }
             }
-            console.log(this.cache)
             this.navigate()
         }
 
@@ -226,6 +226,7 @@
                 .style.display = "none"
 
             let thisUrl = url()
+            console.log(thisUrl)
             // 当记录存在，直接返回
             if (typeof this.cache.route[thisUrl.hash.href] !== "undefined") {
                 this.shadow.querySelector(`div[route-name="${thenName}"]`)
@@ -242,7 +243,7 @@
                             isRoute = true
                             thenName = name
                             // 记录路由
-                            this.cache.route[thisUrl.hash.href] = name
+                            this.cache.route[thisUrl.href] = name
                             break //匹配一个就够了
                         } else {
                             continue
@@ -254,12 +255,13 @@
                     // --------------------------------应该还要加 params 和 query
                     this.shadow.querySelector(`div[route-name="${thenName}"]`)
                         .style.display = "block"
-                } else {
-                    throw new Error('No route was matched. Procedure');
                 }
+                /* else {
+                    throw new Error('No route was matched. Procedure');
+                } */
             }
 
-            console.log(thisUrl.hash.href)
+            console.log(thisUrl.href)
         }
 
         // 实例化组件
