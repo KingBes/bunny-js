@@ -80,16 +80,16 @@
             if (attr.name == "image-top" || attr.name == "image-bottom") {
                 const img = document.createElement("img")
                 img.src = attr.value
-                currdoc.querySelector(`[class="${attr.name}"]`)
+                document.querySelector(`[class="${attr.name}"]`)
                     .appendChild(img)
             } else {
-                currdoc
+                document
                     .querySelector(".card")
                     .setAttribute(attr.name, attr.value)
             }
         }
-        let header = currdoc.querySelector('[class="header"]')
-        let footer = currdoc.querySelector('[class="footer"]')
+        let header = document.querySelector('[class="header"]')
+        let footer = document.querySelector('[class="footer"]')
 
         if (!header.querySelector('slot').assignedNodes().length) {
             header.style.display = "none"

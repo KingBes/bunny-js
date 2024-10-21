@@ -46,7 +46,7 @@
     <span></span>
     <script>
         for (const attr of attrs) {
-            currdoc
+            document
                 .querySelector("span")
                 .setAttribute(attr.name, attr.value)
         }
@@ -54,6 +54,6 @@
         if (attrs?.text.value) {
             text = attrs.text.value
         }
-        currdoc.querySelector("span").innerHTML = text
+        document.querySelector("span").innerHTML = text
     </script>
 </template>

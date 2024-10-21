@@ -1,8 +1,10 @@
 <template>
     <a href="#/about">跳转</a>
     <div id="demo-div"></div>
+    <div class="pap-buton"></div>
     <script>
         component("#demo-div", "demo-div")
+        component(".pap-buton", "paper/button")
         // console.log(document,params,query,component)
 
         onDestroy(function () {
