@@ -1,7 +1,7 @@
 !function (win) {
     "use strict";
 
-    // 插件名称
+    // 框架名称
     const appName = "bunny"
 
     /**
