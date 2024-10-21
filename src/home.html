@@ -1,7 +1,13 @@
 <template>
-    <a href="/#/about">跳转</a>
-    <!-- <demo-div></demo-div> -->
+    <a href="#/about">跳转</a>
+    <div id="demo-div"></div>
     <script>
-        console.log(document)
+        component("#demo-div", "demo-div")
+        // console.log(document,params,query,component)
+
+        onDestroy(function () {
+            console.log("卸载")
+        })
+
     </script>
 </template>

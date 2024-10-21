@@ -89,20 +89,14 @@
         if (!status) {
             return status
         } else {
-            return status
+            return data
         }
     }
 
     /**
-     * 检测标签名
-     * @param {string} str 标签名
-     * @returns bool
+     * 获取当前url信息
+     * @returns object
      */
-    function checkString(str) {
-        const regex = /^[a-z].*-.*/;
-        return regex.test(str);
-    }
-
     function url() {
         const fullHash = win.location.hash.substring(1)
         let targetHash;
@@ -129,42 +123,58 @@
         return data
     }
 
+    // 实例化组件
+    async function comp(tags, path = "", shadow = document) {
+        const tagArr = shadow.querySelectorAll(tags)
+        if (path === "") {
+            path = tags
+        }
+        try {
+            const template = await getCompontent(`/component/${path}.html`)
+            for (const tag of tagArr) {
+                new Component(tag, template)
+            }
+        } catch (error) {
+            console.error(error.message)
+        }
+    }
+
     /**
-     * 路由组件
+     * 组件类
      */
-    class RouteComponent {
+    class Component {
         constructor(shadow, template) {
-            this.params = {} //接收的参数
-            this.query = {} //接收的请求
+            this.then = shadow
             this.shadow = shadow.attachShadow({ mode: "open" })
             this.template = template.content
-            // 初次更新
-            this.updateShadow()
-            // 监听属性来改变接收参数和请求
+
+            // 监听属性来
             this.observer = new MutationObserver((mutationsList) => {
                 for (const mutation of mutationsList) {
-                    if (mutation.type === 'attributes' &&
-                        ["params", "query"].some(element => element.includes(mutation.attributeName))) {
-                        // 未完待续。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
+                    if (mutation.type === 'attributes') {
                         this.clearShadow()
                         this.updateShadow()
                     }
                 }
             })
+            this.observer.observe(shadow, { attributes: true })
+            this.updateShadow()
         }
 
-        // 更新所有内容
         updateShadow() {
             for (const value of this.template.childNodes.values()) {
                 if (value.nodeName !== "SCRIPT") {
                     this.shadow.appendChild(value.cloneNode(true));
                 } else {
-                    const fn = new Function('doc,params,query',
-                        `(function(document,params,query) {
+                    const fn = new Function('doc,attrs,comp',
+                        `(function(document,attrs,comp) {
                             "use strict";
+                            function component(tag,path=""){
+                                comp(tag,path,document)
+                            }
                             ${value.textContent}
-                        })(doc,params,query)`)
-                    fn(this.shadow, this.params, this.query)
+                        })(doc,attrs,comp)`)
+                    fn(this.shadow, this.then.attributes, comp)
                 }
             }
         }
@@ -175,6 +185,79 @@
                 this.shadow.removeChild(this.shadow.firstChild);
             }
         }
+    }
+
+    /**
+     * 路由组件
+     */
+    class RouteComponent {
+        constructor(shadow, template) {
+            this.shadow = shadow.attachShadow({ mode: "open" })
+            this.template = template.content
+
+            this.onDestroy = this.onDestroy.bind(this)
+
+            // 监听属性来改变接收参数和请求
+            this.observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'attributes' &&
+                        ["params", "query"].some(element => element.includes(mutation.attributeName))) {
+                        const params = JSON.parse(mutation.target.attributes.params.value)
+                        const query = JSON.parse(mutation.target.attributes.query.value)
+                        this.clearShadow()
+                        this.updateShadow(params, query)
+                    }
+                }
+            })
+            this.observer.observe(shadow, { attributes: true })
+
+        }
+
+        /**
+         * 更新所有内容
+         * @param {object|false} params 参数
+         * @param {object} query get请求
+         */
+        updateShadow(params = false, query = {}) {
+            for (const value of this.template.childNodes.values()) {
+                if (value.nodeName !== "SCRIPT") {
+                    this.shadow.appendChild(value.cloneNode(true));
+                } else {
+                    const fn = new Function('doc,params,query,comp,onDestroy',
+                        `(function(document,params,query,comp,onDestroy) {
+                            "use strict";
+                            function component(tag,path=""){
+                                comp(tag,path,document)
+                            }
+                            ${value.textContent}
+                        })(doc,params,query,comp,onDestroy)`)
+                    fn(this.shadow, params, query, comp, this.onDestroy)
+                }
+            }
+        }
+
+        // 清空所有内容
+        clearShadow() {
+            while (this.shadow.firstChild) {
+                this.shadow.removeChild(this.shadow.firstChild);
+            }
+        }
+
+        /**
+         * 执行卸载
+         */
+        destroy = async function () { }
+
+        /**
+         * 调用卸载
+         * @param {callback} callback 函数
+         */
+        onDestroy(callback) {
+            this.destroy = async function () {
+                callback()
+            }
+        }
+
     }
 
     // 注册入口组件
@@ -206,8 +289,7 @@
             for (const value of routeJson) {
                 const div = document.createElement("div")
                 div.setAttribute("route-name", value.name)
-                div.setAttribute("params", "{}")
-                div.setAttribute("query", "{}")
+
                 div.setAttribute("style", "display:none;")
                 this.shadow.append(div)
                 this.cache.template[value.name] = {
@@ -215,30 +297,41 @@
                     dom: new RouteComponent(div, await getCompontent(value.page))
                 }
             }
-            this.navigate()
+            // console.log(this.cache)
+            await this.navigate()
         }
 
         /**
          * 导航
          */
-        navigate() {
-            this.shadow.querySelector("div[route-name]")
-                .style.display = "none"
+        async navigate() {
+
+            let otherRoute = this.shadow.querySelectorAll("div[route-name]")
+
+            for (var i = 0; i < otherRoute.length; i++) {
+                if (otherRoute[i].style.display == "block") {
+                    const name = otherRoute[i].getAttribute("route-name")
+                    await this.cache.template[name].dom.destroy()
+                }
+                otherRoute[i].style.display = "none";
+            }
 
             let thisUrl = url()
-            console.log(thisUrl)
+
             // 当记录存在，直接返回
-            if (typeof this.cache.route[thisUrl.hash.href] !== "undefined") {
-                this.shadow.querySelector(`div[route-name="${thenName}"]`)
+            if (typeof this.cache.route[thisUrl.href] !== "undefined") {
+                this.shadow.querySelector(`div[route-name="${this.cache.route[thisUrl.href]}"]`)
                     .style.display = "block"
+                return
             } else {
                 let isRoute = false
                 let params = {}
                 let thenName
                 for (const [name, value] of Object.entries(this.cache.template)) {
-                    console.log(name, value)
+                    // console.log(name, value)
                     for (const p of value.path) {
                         params = matchParams(thisUrl.hash.href, p)
+                        // console.log(params)
                         if (params !== false) {
                             isRoute = true
                             thenName = name
@@ -252,35 +345,16 @@
                 }
                 // 确定有效路由
                 if (isRoute) {
-                    // --------------------------------应该还要加 params 和 query
-                    this.shadow.querySelector(`div[route-name="${thenName}"]`)
-                        .style.display = "block"
+                    let routeOjb = this.shadow.querySelector(`div[route-name="${thenName}"]`)
+                    routeOjb.style.display = "block"
+                    routeOjb.setAttribute("params", JSON.stringify(params))
+                    routeOjb.setAttribute("query", JSON.stringify(thisUrl.query))
                 }
+                // 找不到路由时
                 /* else {
                     throw new Error('No route was matched. Procedure');
                 } */
             }
-
-            console.log(thisUrl.href)
         }
-
-        // 实例化组件
-        /* component(tagName) {
-            if (typeof tagName === "string") {
-                tagName = [tagName]
-            }
-            for (const val of tagName) {
-                if (!checkString(val)) {
-                    throw new Error(`The key '${val}' must start with a lowercase letter and contain a hyphen.`)
-                }
-                const tpl = getCompontent(`/component/${val}.html`)
-                customElements.define(val, class extends HTMLElement {
-                    constructor() { 
-                        super()
-                    }
-                })
-            }
-        } */
-
     });
 }(window);
